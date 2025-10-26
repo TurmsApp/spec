@@ -1,0 +1,42 @@
+This point-to-point architecture choice ensures the resilience and privacy of 
+telecommunications. However, authenticity is more difficult to preserve.
+
+\subsection{Privacy}
+
+The term \enquote{privacy} is semantically rich. It ranges from an individual's 
+physical condition to their most fundamental rights \cite{rfc6973}. P2P 
+connections avoid some threats. For instance, surveillance is made more tricky; 
+uniquely if traffic is encrypted. Since data is stored locally, it relies on 
+hardware security measures and only compromises one user in the event of a 
+leak. However, it discloses the IP address, this gives an approximate 
+geolocation of the peer. To maximize benefits, you SHOULD use onions, but it 
+remains complicated.
+
+\subsection{Authenticity}
+
+Authenticity allows the author of a message to be proven. In P2P, authenticity 
+is hard to prove. Turms allows individuals to authenticate themselves through 
+an Autha instance, or to remain as \enquote{guests.}
+
+\begin{enumerate}
+    \item \textbf{Autha instance with discovery server}: discovery server 
+validates the decentralized identity, then generates a JWT. During signaling, 
+the discovery server acts as a trusted third party. User acquires the ID 
+\enquote{user\_id@discovery\_server.tld.} Once the initial connection has been 
+established, messages are authenticated by their signature.
+    \item \textbf{Autha instance without discovery server}: user generates a 
+token that will be sent to the peer, who will verify it using the public key 
+provided by the user's Autha instance.
+    \item \textbf{As guest}: untrustworthy and inauthentic by nature. Trust is 
+acquired through the SDP transmission channel.
+\end{enumerate}
+
+\subsection{Integrity}
+
+Integrity ensures that messages has not been altered during transit. This 
+component goes hand in hand with data encryption.
+
+\subsection{Resilience}
+
+P2P simplifies resilience. By design, there is no longer a single point of 
+failure, except for the network itself.

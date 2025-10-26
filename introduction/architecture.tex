@@ -1,0 +1,88 @@
+Direct communication between clients is often impossible, mainly due to 
+firewalls and NAT. Turms' architecture takes these issues into account.
+
+\subsection{Peer discovery}
+
+There are several ways to find peers. Turms implements only two of them:
+\begin{enumerate}
+    \item SDP sharing
+    \item Discovery server
+\end{enumerate}
+
+\subsubsection{SDP sharing}
+
+Session Description Protocol (SDP) is an essential component of WebRTC.
+% (\ref{subsec:webrtc}).
+It allows two peers to connect directly to each other without going through a 
+discovery server. SDP contains the codec, source address, and timing 
+information for audio and video. During the initial initialization, SDP does 
+not contain audio and video codecs. These are renegotiated on the fly when the 
+two peers wish to communicate via audio or video. This choice avoids the slight 
+overhead of finding the hardware beforehand and then during transmission, when 
+it turns out to be unnecessary. SDP also contains information for initiating a 
+secure connection (\ref{sec:dlts}).
+SDP sharing implies user shares its SDP outside Turms network.
+\newpage
+
+Turms SDP MUST contains:
+\begin{center}
+\begin{tabular}{||c c c||} 
+ \hline
+ Name & Content & Description \\ [0.5ex] 
+ \hline\hline
+ v & 0 & SDP version. \\ 
+ \hline
+ o &  & Session origin. \\ 
+ \hline
+ s & - & Session name. \\ 
+ \hline
+ t & 0 0 & Session time. \\ 
+ \hline
+ a=fingerprint &  & DTLS fingerprint. \\ 
+ \hline
+ a=group & BUNDLE 0 & Bundled media. \\ 
+ \hline
+ a=extmap-allow-mixed &  & Mixed RTP extensions. \\ 
+ \hline
+ m &  & Media description. \\ 
+ \hline
+ c &  & Connection info. \\ 
+ \hline
+ a=setup & actpass & DTLS role. \\ 
+ \hline
+ a=mid & 0 & Media ID. \\ 
+ \hline
+ a=sendrecv &  & Bidirectional flow. \\ 
+ \hline
+ a=sctp-port & 5000 & SCTP port. \\ 
+ \hline
+ a=ice-ufrag &  & ICE username. \\ 
+ \hline
+ a=ice-pwd &  & ICE password. \\ 
+ \hline
+ a=candidate & (multiple) & ICE candidates. \\ 
+ \hline
+ typ host &  & Local candidate. \\ 
+ \hline
+ typ srflx &  & Reflexive candidate. \\ 
+ \hline
+ raddr / rport &  & Related address/port. \\ 
+ \hline
+ a=end-of-candidates &  & End of ICE list. \\ 
+ \hline
+\end{tabular}
+\end{center}
+
+The SDP MUST be passed in JSON format, as:
+\begin{center}
+    \begin{tikzpicture}
+        \umlclass[x=-6,y=-4]{SDP}{
+            + type : String = "sdp" \\
+            + sdp : String
+        }{}
+    \end{tikzpicture}
+\end{center}
+
+\subsubsection{Discovery server}
+
+See: \nameref{chap:discovery}

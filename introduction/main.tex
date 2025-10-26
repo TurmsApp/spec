@@ -1,0 +1,27 @@
+Gravitalia Turms (\enquote{Turms}) is a point-to-point messaging service. 
+Message exchanges are encrypted using multiple layers (\enquote{multi-layer 
+encryption,} \enquote{E2EE}). Message storage is encrypted at rest. Turms is 
+not yet a peer-to-peer messaging service, as it does not provide indirect 
+benefits to other peers\cite{rfc5694}.
+
+\begin{center}
+\begin{tikzpicture}
+    \umlactor {Peer 1}
+    \umlactor [x=6] {Peer 2}
+    \umlassoc[arg=Communication, pos=0.5]{Peer 1}{Peer 2}
+
+    \umlusecase[x=3,y=-2,name=discovery]{Discovery server}
+    \umlaggreg[style=dashed]{discovery}{Peer 1}
+    \umlaggreg[style=dashed]{discovery}{Peer 2}
+\end{tikzpicture}
+\end{center}
+
+\section{Architecture}
+\label{sec:architecture}
+
+\input{introduction/architecture}
+
+\section{Goals}
+\label{sec:goals}
+
+\input{introduction/goals}

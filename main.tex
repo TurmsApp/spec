@@ -1,0 +1,166 @@
+\documentclass[11pt,a4paper]{scrreprt}
+
+\usepackage{draftwatermark}
+
+\usepackage[left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm]{geometry}
+
+\usepackage{erewhon}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+
+\usepackage[natbib=true,backend=bibtex]{biblatex}
+\addbibresource{refs.bib}
+
+\newcommand{\theauthor}{Gravitalia}
+\newcommand{\thetitle}{Turms specification}
+\newcommand{\theversion}{0.1.0}
+
+\title{\thetitle}
+\author{v\theversion\\\theauthor}
+\date{2025-10-24}
+
+% Metadata
+\usepackage{hyperref}
+\hypersetup{
+    pdfauthor={\theauthor},
+    pdftitle={\thetitle},
+}
+
+% TikZ
+\usepackage{tikz}
+\usepackage{tikz-uml}
+\usepackage{pgfplots}
+
+% Miscellaneous
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{xcolor} % Driver-independent color extensions for LaTeX
+\usepackage[inline,shortlabels]{enumitem}
+
+% Mathematics
+\usepackage{amsmath}
+
+% Appendix
+\usepackage{appendix}
+\usepackage{pdfpages}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\section*{Terminology}
+
+\input{terminology}
+
+\chapter{Introduction}
+\label{chap:intro}
+
+\input{introduction/main}
+
+\chapter{Authentification}
+
+\section{Datagram Transport Layer Security}
+\label{sec:dlts}
+
+\section{Extended Triple Diffie-Hellman}
+
+\section{Double Ratchet}
+
+\chapter{Messages}
+
+\section{Network}
+
+\subsection{Transport}
+
+\[
+\text{WebRTCManager} = 
+\left(
+\begin{array}{l}
+\text{peer\_connection} \in \mathcal{P},\\
+\text{ice} \subseteq \mathcal{I},\\
+\text{channel} \in \mathcal{C} \cup \{\emptyset\},\\
+\text{is\_initiator} \in \{\text{false}, \text{true}\},\\
+\text{offer} \in \Sigma^*
+\end{array}
+\right)
+\]
+
+\subsection{Fallback}
+
+\section{Events}
+
+\begin{center}
+\begin{tikzpicture}
+\begin{umlpackage}[type=peer-to-peer]{ChatModel}
+
+\umlenum[x=0,y=0]{Event}{
+    + DHKey(x3dh: X3DH) \\
+    + Message(msg: Message) \\
+    + Typing()
+}{}
+
+\umlclass[x=-6,y=-4]{X3DH}{
+    + public\_key : Vector<Byte> \\
+    + otk : Vector<Byte>
+}{}
+
+\umlclass[x=0,y=-8]{Message}{
+    + author : String \\
+    + recipient : String \\
+    + content : String \\
+    + timestamp : DateTime \\
+    + edited\_timestamp : DateTime \\
+    + reactions : Vector<Char> \\
+    + attachments : Vector<Attachment> \\
+    + flags : Flags
+}{}
+
+\umlclass[x=6,y=-8]{Attachment}{
+    + filename : String \\
+    + mime\_type : Optional<String> \\
+    + url : Optional<String> \\
+    + blob : Optional<Vector<Byte>> \\
+    + flags : Flags
+}{}
+
+\umlclass[x=0,y=-12]{Flags}{
+    + URGENT : Boolean \\
+    + EPHEMERAL : Boolean
+}{}
+
+\umlaggreg[arg=hasX3DH, mult=1, pos=0.5]{Event}{X3DH}
+\umlaggreg[arg=hasMessage, mult=1, pos=0.5]{Event}{Message}
+\umlaggreg[arg=hasAttachments, mult=*, pos=0.5]{Message}{Attachment}
+\umlaggreg[arg=usesFlags, mult=1, pos=0.5]{Message}{Flags}
+\umlaggreg[arg=usesFlags, mult=1, pos=0.5]{Attachment}{Flags}
+\end{umlpackage}
+\end{tikzpicture}
+\end{center}
+
+\section{Content}
+
+\section{Cryptography}
+
+\chapter{Discovery server}
+\label{chap:discovery}
+
+\section{Decentralized authentification}
+
+\section{Message buffering}
+
+\printbibliography
+
+\clearpage
+\appendix
+
+\begin{appendices}
+\addcontentsline{toc}{chapter}{Démonstration de la résilience d'un réseau P2P}
+\includepdf[pages={-},
+            pagecommand={\thispagestyle{plain}}
+           ]{appendices/resilience.pdf}
+\end{appendices}
+
+\end{document}

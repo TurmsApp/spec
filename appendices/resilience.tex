@@ -1,0 +1,211 @@
+\documentclass[french]{llncs}
+
+\usepackage{erewhon}
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{csquotes}
+\usepackage{caption}
+
+\addto\captionsfrench{%
+  \renewcommand{\theoremname}{Théorème}%
+}
+\addto\captionsfrench{%
+  \renewcommand{\lemmaname}{Lemme}%
+}
+\addto\captionsfrench{%
+    \renewcommand{\keywordname}{\textbf{Mots-clés~:}}%
+}
+
+% Bibliography.
+\usepackage[natbib=true,backend=bibtex]{biblatex}
+\addbibresource{../refs.bib}
+
+% Mathematics stuff.
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{xspace}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18}
+\usepackage[ruled,vlined]{algorithm2e} % pseudo-code.
+
+% TikZ
+\usepackage{tikz}
+\usepackage{pgfplots}
+
+% Miscellaneous
+\usepackage{multicol}
+\usepackage{listings}
+\usepackage{xcolor} % Driver-independent color extensions for LaTeX
+\usepackage[inline,shortlabels]{enumitem}
+
+\newcommand{\theauthor}{A. CN}
+\newcommand{\thetitle}{Démonstration de la résilience d'un réseau P2P}
+
+% Metadata
+\usepackage{hyperref}
+\hypersetup{
+    pdfauthor={\theauthor},
+    pdftitle={\thetitle},
+}
+
+\begin{document}
+
+\title{\thetitle}
+\author{\theauthor}
+\authorrunning{A. CN}
+\institute{Gravitalia\\
+\email{acn@gravitalia.com}}
+
+\maketitle
+
+\keywords{Résilience \and Pair-à-pair \and Théorie des graphes \and Théorie de 
+la percolation}
+
+\begin{abstract}
+    Cette démonstration, par la théorie des graphes, permet d'aborder la 
+capacité des réseaux pair-à-pair à tolérer la disparition de plusieurs 
+n\oe{}uds.
+\end{abstract}
+
+\section{Introduction}
+
+La démonstration modélise un graphe aléatoire de sommets (n\oe{}uds) 
+éventuellement connectés entre eux. Chaque sommet représente un pair. Cette 
+démonstration modélise un réseau pair-à-pair, où chaque pair agit au bénéfice 
+des autres~; et non un réseau point-à-point. Nous considérons qu'il n'existe ni 
+congestion réseau ni attaque sur le réseau.
+
+\section{Démonstration}
+
+Soit une famille de variables de Bernoulli indépendantes 
+\(\left(X_{i,j}\right)_{1 \le i < j \le n}\) de paramètre \(p \in 
+\left[0,1\right]\), où \(n \in \mathbb{N}\) est le nombre de sommets, 
+définissant un graphe d'Erdös-Rényi\cite{erdos1960} \(G(n,p)\) tel que 
+\(X_{i,j}=1\) si l'arête \((i,j)\) existe et \(0\) sinon.
+
+\nocite{gayral2017} \nocite{thevenin2016} % Thanks for their lessons!
+
+\begin{theorem}[Connexité]\label{thm:connected}
+  \(p(n) = \frac{\log n + c_n}{n}\) est seuil critique pour la connexité du 
+graphe d'Erdős-Rényi.
+  Plus précisément,
+  \[
+      \mathbb{P}(G(n,p(n)) \text{ est connexe}) 
+\mathop{\to}\limits_{c_n\to\pm\infty}
+      \begin{cases}
+          1 \text{ si } c_n \to +\infty\\
+          0 \text{ si } c_n \to -\infty
+      \end{cases}
+  \]
+\end{theorem}
+
+\begin{lemma}[Composante géante]\label{lem:geant}
+  Posons \(p = \frac{c}{n}\), avec \(c = n \cdot p\) la densité moyenne de 
+connexions par sommet.
+  \begin{itemize}
+      \item Si \(c<1\), alors en moyenne chaque sommet à moins d'un voisin. Les 
+composantes sont de tailles \(\Theta(\log n)\).
+      \item Si \(c=1\), alors il y a une transition du seuil de percoation. La 
+plus grande composante est de taille \(\Theta(n^{2/3})\).
+      \item Si \(c>1\), alors une composante géante apparaît et contient une 
+fraction significative des n\oe{}uds.
+  \end{itemize}
+\end{lemma}
+
+A partir du lemme \ref{lem:geant}, on peut déterminer lorsqu'un réseau 
+pair-à-pair est viable, et s'assurer que les données arrivent au pair voulu. 
+Seuls \(\alpha~\%\) des n\oe{}uds sont en dehors de la composante géante, avec :
+\[ \alpha = e^{-c(1-\alpha)} \]
+
+\begin{theorem}[de Menger]\label{thm:menger}
+    Soient \(G\) un graphe non-orienté, et \(x\) et \(y\) deux sommets 
+distincts.
+    Le nombre maximal de chemins  \(x\mbox{-}y\) internement disjoints est égal 
+au nombre minimal de sommets dont la suppression sépare \(x\) de \(y\).
+\end{theorem}
+
+Dans le contexte du réseau P2P, le nombre maximal de chemins disjoints entre le 
+pair émetteur \(x\) et le pair récepteur \(y\) est égal à la résilience 
+minimale de la connexion \((x,y)\) contre la défaillance des intermédiaires.
+
+Le théorème \ref{thm:connected} nous donne le seuil pour la 1-connexité 
+(connexité simple, où \(k=1\)) du graphe total.
+Pour assurer une résilience, nous avons besoin d'une k-connexité avec 
+\(k\geq2\). Le seuil de probabilité \(p(n)\) requis pour qu'un graphe 
+d'Erdős-Rényi soit k-connexe est :
+
+\begin{theorem}[Seuil de k-Connexité]\label{thm:k-connected}
+    Pour tout entier fixe \(k\geq1\), la probabilité d'arête \(p(n)\) tel que
+    \begin{equation*}
+        p(n) \geq \dfrac{\log n + (k-1)\log(\log n)+\omega(1)}{n}
+    \end{equation*}
+    est un seuil critique pour la k-connexité de \(G(n,p(n))\).
+\end{theorem}
+
+Partons des postulats que les serveurs d'un réseau (\(m\)) centralisé soient 
+entièrement connectés (\(p_m=1\)) et que \(m\) croît plus lentement que 
+\(n\)\footnote{Par exemple, on peut avoir \(m = \Theta(\frac{\log n}{\log \log 
+n})\). Empiriquement, on observe que \(m\) croît plus lentement que \(n\). Ce 
+postulat permet de garantir une solution pour un \(n\) très grand.}. On cherche 
+donc quand un réseau pair-à-pair est plus résilient qu'un réseau centralisé, 
+sachant que \(n>m\), c'est-à-dire que dans les deux cas, il y a plus 
+d'utilisateurs que de serveurs -- ce qui est le cas empiriquement.
+
+Notons \(\mathcal{K}\) la fonction associé au théorème \ref{thm:menger}. Nous 
+cherchons donc lorsque :
+
+\[
+    \mathcal{K}(G_{p2p}) \geq \mathcal{K}(G_{m})
+\]
+
+Ainsi, pour déconnecter deux n\oe{}uds dans \(\mathcal{K}_m\), il faut retirer 
+les \(m-2\) autres n\oe{}uds, donc la connectivité de \(\mathcal{K}_m\) est :
+
+\begin{equation}
+    \label{eq:server}
+    \mathcal{K}(G_{\text{serveur}}) = \mathcal{K}(G(m,1))=m-1
+\end{equation}
+
+Donc, pour que le réseau pair-à-pair soit au moins résilient que le réseau 
+centralisé, il faut que :
+\[
+    \mathcal{K}(G_{p2p}) \geq m-1
+\]
+
+Injectons (\ref{eq:server}) dans la condition obtenue au théorème 
+\ref{thm:k-connected}.
+
+\[
+    p(n)\gtrsim \dfrac{\log n + ((m(n)-1)-1)\log(\log n)+\omega(1)}{n} = 
+        \boxed{\dfrac{\log n + (m(n)-2)\log(\log n)+\omega(1)}{n}}
+\]
+
+\paragraph{Conclusion.} Bien que le réseau pair-à-pair ait plus de n\oe{}uds, 
+il n'est pas plus résilient par nature. Il ne le devient que lorsque sa densité 
+de connexion \(p(n)\) est suffisamment élevée pour atteindre le seuil de 
+\(m\)-connexité, garantissant au moins \(m\) chemins disjoints entre les pairs, 
+surpassant ainsi les \(m-1\) chemins disjoints du réseau centralisé 
+\(\mathcal{K}_{m}\).
+
+\paragraph{Critique du modèle.} Nous nous sommes néanmoins intéressé à un cas 
+très favorable au réseau centralisé, représenté sous forme d'un graphe complet. 
+Dans la pratique, tous les serveurs ne sont pas connectés entre eux, donc 
+\(p_m<1\). Le réseau pair-à-pair est donc résilient plus rapidement que le 
+réseau centralisé. Néanmoins, nous omettons la différence entre suppression 
+aléatoire et suppression stratégique. Dans ce dernier cas, les n\oe{}uds les 
+plus connectés sont supprimés et la résilience du réseau pair-à-pair est plus 
+difficile.
+
+\paragraph{Cas d'un réseau point-à-point.} Dans le cas d'un réseau 
+point-à-point, lorsque les deux pairs (\(n=2\)) sont connectés, alors \(p=1\). 
+Les deux pairs forment, par nature, une composante géante, avec \(\alpha=0\) et 
+un seul chemin. Ce qui implique nécessairement qu'il y a un point de 
+défaillance unique. La démonstration résultante est donc moins intéressante. 
+Mais cette défaillance se produit uniquement pour ces deux pairs et non pour le 
+réseau entier~:~le reste des connexions continent de fonctionner.
+
+\printbibliography
+
+\end{document}

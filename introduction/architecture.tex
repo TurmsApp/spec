@@ -76,8 +76,8 @@ Turms SDP MUST contains:
 The SDP MUST be passed in JSON format, as:
 \begin{center}
     \begin{tikzpicture}
-        \umlclass[x=-6,y=-4]{SDP}{
-            + type : String = "sdp" \\
+        \umlclass{SDP}{
+            + type : String = "offer" | "answer" \\
             + sdp : String
         }{}
     \end{tikzpicture}

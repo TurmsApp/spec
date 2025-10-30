@@ -1,0 +1,36 @@
+\begin{tikzpicture}
+    \begin{umlpackage}[]{WebRTC}
+        \umlenum[x=0,y=0]{Description}{
+            + Answer(RTCSessionDescription) \\
+            + Offer(RTCSessionDescription) \\
+            + None
+        }{}
+
+        \umlclass[x=0,y=-6,type=ThreadSafeShared]{WebRTCManager}{
+            + peer\_connection : RTCPeerConnection \\
+            + ice : Vector<RTCIceCandidate> \\
+            + channel : RTCDataChannel \\
+            + session : Optional<Session> \\
+            + description : Description
+        }{
+            \umlvirt{+ init(servers : Vector<RTCIceServer>) : WebRTCManager} \\
+            \umlvirt{+ create\_offer() : RTCSessionDescription} \\
+            \umlvirt{+ create\_answer() : RTCSessionDescription} \\
+            \umlvirt{+ connect(offer: String) : RTCSessionDescription} \\
+            \umlvirt{+ create\_channel() : RTCDataChannel} \\
+            \umlvirt{+ send(message : String) : << raises Error >>}
+        }{}
+
+        \umlclass[x=9,y=-6]{Session}{
+            - session\_keys : SessionKeys \\
+            - sending\_ratchet : DoubleRatchet \\
+            - receiving\_chains : ChainStore
+        }{
+            \umlvirt{+ encrypt(message : Vector<Byte>) : Vector<Byte>} \\
+            \umlvirt{+ decrypt(message : Vector<Byte>) : Vector<Byte>}
+        }{}
+
+        \umlaggreg[arg=hasDescription, mult=1, pos=0.5]{Description}{WebRTCManager}
+        \umlaggreg[mult=1, pos=0.5]{WebRTCManager}{Session}
+    \end{umlpackage}
+\end{tikzpicture}

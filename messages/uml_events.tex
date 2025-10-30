@@ -1,0 +1,46 @@
+\begin{center}
+    \begin{tikzpicture}
+    \begin{umlpackage}[type=peer-to-peer]{ChatModel}
+        \umlenum[x=0,y=0]{Event}{
+            + DHKey(x3dh: X3DH) \\
+            + Message(msg: Message) \\
+            + Typing()
+        }{}
+
+        \umlclass[x=-6,y=-4]{X3DH}{
+            + public\_key : Vector<Byte> \\
+            + otk : Vector<Byte>
+        }{}
+
+        \umlclass[x=0,y=-8]{Message}{
+            + author : String \\
+            + recipient : String \\
+            + content : String \\
+            + timestamp : DateTime \\
+            + edited\_timestamp : DateTime \\
+            + reactions : Vector<Char> \\
+            + attachments : Vector<Attachment> \\
+            + flags : Flags
+        }{}
+
+        \umlclass[x=6,y=-8]{Attachment}{
+            + filename : String \\
+            + mime\_type : Optional<String> \\
+            + url : Optional<String> \\
+            + blob : Optional<Vector<Byte>> \\
+            + flags : Flags
+        }{}
+
+        \umlclass[x=0,y=-12]{Flags}{
+            + URGENT : Boolean \\
+            + EPHEMERAL : Boolean
+        }{}
+
+        \umlaggreg[arg=hasX3DH, mult=1, pos=0.5]{Event}{X3DH}
+        \umlaggreg[arg=hasMessage, mult=1, pos=0.5]{Event}{Message}
+        \umlaggreg[arg=hasAttachments, mult=*, pos=0.5]{Message}{Attachment}
+        \umlaggreg[arg=usesFlags, mult=1, pos=0.5]{Message}{Flags}
+        \umlaggreg[arg=usesFlags, mult=1, pos=0.5]{Attachment}{Flags}
+    \end{umlpackage}
+    \end{tikzpicture}
+\end{center}

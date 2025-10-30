@@ -1,12 +1,22 @@
-Messages are the standardized ways of communication between peers or servers. Implementation MUST be identical.
+Messages are the standardized ways of communication between peers or servers. 
+Implementation MUST be identical.
 
 \section{Network}
+
+Everything that passes through MUST be converted into bytes to ensure 
+interoperability between unencrypted and encrypted messages. No strings over 
+channel. Message serialization format MUST be JSON. Deserialization is 
+performed according to the events below.
 
 \subsection{Transport}
 
 \input{messages/uml_webrtc}
 
-One, and only one, \texttt{WebRTCManager} MUST be used for one, and only one, WebRTC session. Once the WebRTC session has been created, after the exchange of offer, response to offer, and response to response to offer, both peers MUST exchange their public keys, OTK, and pre-keys (X3DH). Then, \texttt{Session} is created. 
+One, and only one, \texttt{WebRTCManager} MUST be used for one, and only one, 
+WebRTC session. Once the WebRTC session has been created, after the exchange of 
+offer, response to offer, and response to response to offer, both peers MUST 
+exchange their public keys, OTK, and pre-keys (X3DH). Then, \texttt{Session} is 
+created. 
 \bigskip
 
 Transport MUST operate over \nameref{sec:dtls}.
@@ -15,4 +25,6 @@ Transport MUST operate over \nameref{sec:dtls}.
 
 \input{messages/uml_events}
 
-\texttt{Event} MAY be encrypted, depending if session is initialized. When \texttt{Event} is \texttt{Message(Message)} or \texttt{Typing()}, \texttt{Event} MUST be encrypted.
+\texttt{Event} MAY be encrypted, depending if session is initialized. When 
+\texttt{Event} is \texttt{Message(Message)} or \texttt{Typing()}, 
+\texttt{Event} MUST be encrypted.

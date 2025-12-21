@@ -1,30 +1,51 @@
 Messages are the standardized ways of communication between peers or servers. 
-Implementation MUST be identical.
+Implementation MUST be identical. To ensure interoperability between encrypted
+and unencrypted states, all data transmitted over the channel MUST be 
+represented as a sequence of bytes.
 
-\section{Network}
+\section{Data Representation}
 
-Everything that passes through MUST be converted into bytes to ensure 
-interoperability between unencrypted and encrypted messages. No strings over 
-channel. Message serialization format MUST be JSON. Deserialization is 
-performed according to the events below.
+The protocol MUST NOT transmit raw strings directly over the transport layer.
+All message content MUST be serialized into JSON format
+[\href{https://datatracker.ietf.org/doc/html/rfc8259}{RFC8259}].
+\nocite{rfc8259}
 
-\subsection{Transport}
+\subsection{Character Encoding}
 
-\input{messages/uml_webrtc}
+When strings are represented within the JSON payload or converted to bytes, the
+UTF-8 encoding scheme MUST be used. Implementations MUST follow strict UTF-8
+decoding rules; any malformed sequences MUST result in a silent message
+rejection to prevent security vulnerabilities.
 
-One, and only one, \texttt{WebRTCManager} MUST be used for one, and only one, 
-WebRTC session. Once the WebRTC session has been created, after the exchange of 
-offer, response to offer, and response to response to offer, both peers MUST 
-exchange their public keys, OTK, and pre-keys (X3DH). Then, \texttt{Session} is 
-created. 
-\bigskip
+\subsection{Serialization and Deserialization}
 
-Transport MUST operate over \nameref{sec:dtls}.
+\begin{itemize}
+    \item Serialization: All entities MUST serialize messages into a byte
+        stream prior to transmission.
+    \item Deserialization: Upon receipt, the byte stream MUST be deserialized
+        according to the specific event schemas defined below.
+\end{itemize}
 
 \section{Events}
 
-\input{messages/uml_events}
+The encryption of an \texttt{Event} object is conditional upon the state of the
+session. An \texttt{Event} MAY be transmitted in plaintext only if the
+cryptographic session has not yet been initialized. Once the session is
+established, all subsequent \texttt{Event} transmissions MUST be encrypted.
+\bigskip
 
-\texttt{Event} MAY be encrypted, depending if session is initialized. When 
-\texttt{Event} is \texttt{Message(Message)} or \texttt{Typing()}, 
-\texttt{Event} MUST be encrypted.
+Implementations MUST reject any \texttt{Message} or \texttt{Typing} events
+received in plaintext after a session has been successfully initialized.
+\bigskip
+
+When an \texttt{Event} is encrypted, all associated metadata MUST be included
+within the encrypted ciphertext. This includes, but is not limited to,
+timestamps, sender identifiers, and message sequences. Encapsulating metadata
+ensures that no traffic analysis can be performed on the message properties by
+intermediaries.
+\bigskip
+
+\texttt{Event} object MUST includes random padding \([\![0;8192]\!]\) bytes. An
+encrypted event CANNOT be smaller than 1 kilobyte.
+
+\input{messages/uml_events}

@@ -21,6 +21,21 @@ first security layer, ensuring encryption, authenticity and integrity.
 \bigskip
 
 See: \href{https://datatracker.ietf.org/doc/rfc9147/}{RFC 9147}.
+\bigskip
+
+Peer ID is a stable identifier derived exclusively from the peer's long-term
+identity public key (IK). The public key MUST be encoded in its canonical
+binary form as defined in curve identifier. 
+
+\[ \text{Peer ID} = HEX(BLAKE3(IK)[0..16]) \]
+
+Peers MAY display the Peer ID to the user for out-of-band verification.
+Implementations MUST store the Peer ID on first successful authenticated
+session establishment (Trust On First Use).
+
+If a previously stored Peer ID changes, the implementation MUST treat this
+as a potential security violation and require explicit user confirmation
+before continuing communication.
 
 \section{Extended Triple Diffie-Hellman}
 
@@ -136,3 +151,5 @@ DH_r^{(t)})\big) \\[6pt]
     \item \textbf{Unidirectional derivation}: no derived key can be traced back 
         to the root key.
 \end{itemize}
+
+An old key MUST NOT be reused later.

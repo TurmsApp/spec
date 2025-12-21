@@ -1,0 +1,40 @@
+\input{session/uml_webrtc}
+
+\section{WebRTC Manager Cardinality}
+
+A single instance of the \texttt{WebRTCManager} MUST be dedicated to exactly
+one WebRTC session. Implementations MUST NOT reuse a \texttt{WebRTCManager}
+instance across multiple concurrent or sequential sessions to ensure state
+isolation.
+
+\section{Peer-to-Peer Handshake Sequence}
+
+The establishment of a secure communication channel follows a strict phased
+approach:
+
+\begin{enumerate}
+    \item \textbf{WebRTC Signaling}: Peers MUST complete the standard signaling
+        exchange (Offer, Answer, and Pranswer/Acknowledgment).
+
+    \item \textbf{Cryptographic Material Exchange}: Immediately following the
+        WebRTC connection establishment, both peers MUST exchange their
+        cryptographic identity material. This includes:
+        \begin{itemize}
+            \item The Identity Public Key (\(IK\)).
+            \item A Signed Pre-key (\(SPK\)).
+            \item A set of One-Time Pre-keys (\(OTK\)).
+        \end{itemize}
+
+        \item \textbf{Session Initialization}: Upon successful exchange of
+        these keys, peers MUST execute the X3DH (Extended Triple
+        Diffie-Hellman) protocol to derive a shared secret. The Session object
+        MUST be initialized only after the successful derivation of this
+        secret.
+\end{enumerate}
+
+\section{Transport Requirements}
+
+The underlying transport layer MUST operate over DTLS (Datagram Transport Layer
+Security), as specified in Section 4.2 (Transport Layer). All application data
+MUST be encapsulated within the DTLS tunnel to guarantee confidentiality and
+integrity.
